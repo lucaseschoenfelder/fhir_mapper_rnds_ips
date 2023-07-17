@@ -19,6 +19,46 @@ def lookup(system, code):
         print(f'Falha ao fazer lookup')
         return None
 
+@app.route('/condition_CondicaoSaude', methods=['POST'])
+def map_condition_condicaoSaude():
+    condition_rnds = request.get_json()
+
+    if condition_rnds:
+
+        condition_code_coding_code = evaluate(condition_rnds, "Condition.code[0].code.coding.code")[0] #TODO: Verificar preenchimento desse
+        condition_code_coding_system = evaluate(condition_rnds, "Condition.code[0].code.coding.system")[0] #TODO: Verificar preenchimento desse
+
+        condition_subject = evaluate(condition_rnds, "Condition.subject.identifier[0].value")[0]
+
+
+        condition = {
+            "resourceType" : "Condition",
+            "_clinicalStatus" : {
+                "extension": [
+                    {
+                        "url": "http://hl7.org/fhir/StructureDefinition/data-absent-reason",
+                        "valueCode": "unknown"
+                    }
+                ]
+            },
+            "code" : [
+                {
+                    "coding" : {
+                        "system" : condition_code_coding_system,
+                        "code" : condition_code_coding_code
+                    }
+                }
+            ],
+            "subject" : {
+                "reference" : condition_subject
+            }
+        }
+
+        if len(evaluate(condition_rnds, "Condition.verificationStatus")) > 0:
+            condition_verificationStatus = evaluate(condition_rnds, "Condition.verificationStatus.coding.code")[0] # TODO: confirmar preenchimento desse campo
+
+        return jsonify({'resource': Condition(**condition).dict()}), 200
+
 @app.route('/patient', methods=['POST'])
 def map_patient():
     patient_rnds = request.get_json()
