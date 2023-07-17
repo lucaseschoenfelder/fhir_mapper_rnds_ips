@@ -33,14 +33,6 @@ def map_condition_BRCID10Avaliado():
 
         condition = {
             "resourceType" : "Condition",
-            "_clinicalStatus" : {
-                "extension": [
-                    {
-                        "url": "http://hl7.org/fhir/StructureDefinition/data-absent-reason",
-                        "valueCode": "unknown"
-                    }
-                ]
-            },
             "code" : [
                 {
                     "coding" : {
@@ -57,20 +49,31 @@ def map_condition_BRCID10Avaliado():
         if len(evaluate(condition_rnds, "Condition.verificationStatus")) > 0:
             condition_verificationStatus = evaluate(condition_rnds, "Condition.verificationStatus.coding.code")[0] # TODO: confirmar preenchimento desse campo
 
-            patient["verificationStatus"] = {
+            condition["verificationStatus"] = {
                 "coding" : {
                     "code" : condition_verificationStatus
                 }
             }
 
-        if len(evaluate(condition_rnds, "Condition.category")) > 0:
-            condition_category_conding_code = evaluate(condition_rnds, "Condition.category[0].coding.code")[0] # TODO: confirmar preenchimento desse campo
+        if len(evaluate(condition_rnds, "Condition.clinicalStatus")) > 0:
+            condition_category_clinical_status_coding_system = evaluate(condition_rnds, "Condition.clinicalStatus[0].coding.system")[0] # TODO: confirmar preenchimento desse campo
+            condition_category_clinical_status_coding_code = evaluate(condition_rnds, "Condition.clinicalStatus[0].coding.code")[0] # TODO: confirmar preenchimento desse campo
         
-            patient["category"] = {
+            condition["category"] = {
                 "coding" : {
-                    "code" : condition_category_conding_code
+                    "code" : condition_category_clinical_status_coding_code,
+                    "system" : condition_category_clinical_status_coding_system
                 }
             }
+        else:
+            condition["_clinicalStatus"] = {
+                "extension": [
+                    {
+                        "url": "http://hl7.org/fhir/StructureDefinition/data-absent-reason",
+                        "valueCode": "unknown"
+                    }
+                ]
+            },
 
         return jsonify({'resource': Condition(**condition).dict()}), 200
 
