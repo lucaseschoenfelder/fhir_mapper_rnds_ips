@@ -19,6 +19,39 @@ def lookup(system, code):
         print(f'Falha ao fazer lookup')
         return None
 
+@app.route('/practitionerRole', methods=['POST'])
+def map_patient():
+    practitioner_role_rnds = request.get_json()
+
+    if practitioner_role_rnds:
+
+        practitioner_role_practitioner = evaluate(practitioner_role_rnds, "PractitionerRole.practitioner.reference")[0]
+
+        practitioner_role_organization = evaluate(practitioner_role_rnds, "PractitionerRole.organization.reference")[0]
+
+        practitioner_role_code_coding_system = evaluate(immunization_rnds, "PractitionerRole.code[0].coding.system")[0] #TODO: trocar pelo system quando soubermos qual é
+        practitioner_role_code_coding_code = evaluate(immunization_rnds, "PractitionerRole.code[0].coding.code")[0] #TODO: trocar pelo system quando soubermos qual é
+
+        practitioner_role = {
+            "resourceType" : "PractitionerRole",
+            "practitioner" : {
+                "reference" : practitioner_role_patient
+            },
+            "organization" : {
+                "reference" : practitioner_role_organization
+            },
+            "code" : [
+                {
+                    "coding" : {
+                        "system" : practitioner_role_code_coding_system,
+                        "code" : practitioner_role_code_coding_code,
+                    }
+                }
+            ]
+        }
+
+        return jsonify({'resource': PractitionerRole(**practitioner_role).dict()}), 200
+
 @app.route('/patient', methods=['POST'])
 def map_patient():
     patient_rnds = request.get_json()
