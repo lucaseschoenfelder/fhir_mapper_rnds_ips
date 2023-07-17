@@ -19,6 +19,62 @@ def lookup(system, code):
         print(f'Falha ao fazer lookup')
         return None
 
+@app.route('/immunization', methods=['POST'])
+def map_patient():
+    immunization_rnds = request.get_json()
+
+    if immunization_rnds:
+
+        immunization_status = evaluate(immunization_rnds, "Immunization.status")[0]
+
+        immunization_vaccineCode_coding_system = evaluate(immunization_rnds, "Immunization.vaccineCode.coding.system")[0]
+        immunization_vaccineCode_coding_value = evaluate(immunization_rnds, "Immunization.vaccineCode.coding.value")[0]
+
+        #referencia pode vir no reference ou identifier
+        if len(evaluate(immunization_rnds, "Immunization.patient.reference")) > 0:
+            immunization_patient = evaluate(immunization_rnds, "Immunization.patient.reference")[0]
+        else:
+            immunization_patient = evaluate(immunization_rnds, "Immunization.patient.identifier[0].value")[0] # TODO: trocar pelo system quando soubermos qual é
+
+        immunization_occurenceDateTime = evaluate(immunization_rnds, "Immunization.occurenceDateTime")[0]
+
+        immunization_site_coding_system = evaluate(immunization_rnds, "Immunization.site.coding.system")[0] #TODO: trocar pelo system quando soubermos qual é
+        immunization_site_coding_value = evaluate(immunization_rnds, "Immunization.site.coding.code")[0] #TODO: trocar pelo system quando soubermos qual é
+
+        immunization_route_coding_system = evaluate(immunization_rnds, "Immunization.route.coding.system")[0] #TODO: trocar pelo system quando soubermos qual é
+        immunization_route_coding_code = evaluate(immunization_rnds, "Immunization.route.coding.code")[0] #TODO: trocar pelo system quando soubermos qual é
+
+        #immunization_protocolApplied TODO: entender como funciona o campo protocolApplied
+
+        immunization = {
+            "resourceType" : "Immunization",
+            "status" : immunization_status
+            "vaccineCode" : {
+                "coding" : {
+                    "system" : immunization_vaccineCode_coding_system,
+                    "value" : immunization_vaccineCode_coding_value
+                }
+            },
+            "patient" : {
+                "reference" : immunization_patient
+            },
+            "occurence" : immunization_occurenceDateTime,
+            "site" : {
+                "coding" : {
+                    "system" : immunization_site_coding_system,
+                    "value" : immunization_site_coding_code
+                }
+            },
+            "route" : {
+                "coding" : {
+                    "system" : immunization_route_coding_system,
+                    "value" : immunization_route_coding_code
+                }
+            }
+        }
+
+        return jsonify({'resource': Immunization(**immunization).dict()}), 200
+
 @app.route('/patient', methods=['POST'])
 def map_patient():
     patient_rnds = request.get_json()
