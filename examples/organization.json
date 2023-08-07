@@ -1,0 +1,46 @@
+{
+  "operaSus" : "true",
+  "tipoEstabelecimento" : {
+    "codigo" : "05",
+    "valor" : "HOSPITAL GERAL"
+  },
+  "fax" : "8221236766",
+  "coAtividadePrincipal" : "009",
+  "coTipoUnidade" : "05",
+  "cnes" : "2007037",
+  "coUnidade" : "2704302007037",
+  "cnpjMantenedora" : null,
+  "telefone" : "8221236000",
+  "nmAtividade" : "UNIDADE AUXILIAR DE ENSINO",
+  "nmNaturezaJuridica" : "ASSOCIACAO PRIVADA",
+  "competencia" : "202304",
+  "ativo" : "true",
+  "@version" : "1",
+  "coMotivoDesab" : null,
+  "email" : null,
+  "endereco" : {
+    "bairro" : "CENTRO",
+    "coIbgeMunicipio" : "270430",
+    "dataAtualizacaoGeo" : "2020-10-21T03:00:00.000Z",
+    "uf" : "AL",
+    "logradouro" : "RUA BARAO DE MACEIO",
+    "coPais" : "10",
+    "complemento" : null,
+    "numero" : "346",
+    "cep" : "57020360",
+    "nmMunicipio" : "MACEIO",
+    "nmPais" : "BRASIL",
+    "geoLocalizacao" : {
+      "lat" : "-9.66600",
+      "lon" : "-35.73500"
+    }
+  },
+  "cpf" : null,
+  "nomeFantasia" : "SANTA CASA DE MISERICORDIA DE MACEIO",
+  "coNaturezaJuridica" : "3999",
+  "@timestamp" : "2023-05-15T16:12:34.216Z",
+  "coAtividade" : "03",
+  "dataAtualizacao" : "2023-02-28T03:00:00.000Z",
+  "cnpj" : "12307187000150",
+  "razaoSocial" : "SANTA CASA DE MISERICORDIA DE MACEIO"
+}

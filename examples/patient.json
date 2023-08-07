@@ -1,0 +1,94 @@
+{
+  "vip" : "false",
+  "vipDesc" : null,
+  "nome" : "MARIA ROSA CARIAS GOMES",
+  "cns" : [
+    {
+      "enumTipo" : "P",
+      "valor" : "898000010576179",
+      "dataAtribuicao" : "2007-07-09T20:44:25.000-03:00"
+    },
+    {
+      "enumTipo" : "P",
+      "valor" : "209934859650008",
+      "dataAtribuicao" : "2007-07-09T20:44:25.000-03:00"
+    },
+    {
+      "enumTipo" : "D",
+      "valor" : "706203027934866",
+      "dataAtribuicao" : "2014-01-03T21:49:16.000-02:00"
+    }
+  ],
+  "nomeMae" : "JOSEFINA MARCELINA CARIAS",
+  "endereco" : [
+    {
+      "cep" : "83430000",
+      "tipoLogradouro" : {
+        "codigo" : "081",
+        "valor" : "RUA"
+      },
+      "nmMunicipio" : "CAMPINA GRANDE DO SUL",
+      "uf" : "PR",
+      "enumTipo" : "R",
+      "complemento" : "CASA A",
+      "numero" : "1592",
+      "logradouro" : "ALDERICO BANDEIRA DE LIMA",
+      "coPais" : "10",
+      "coIbgeMunicipio" : "410400",
+      "bairro" : "JARDIM PAULISTA",
+      "nmPais" : "BRASIL"
+    }
+  ],
+  "@timestamp" : "2020-08-28T04:28:12.484Z",
+  "localNascimento" : {
+    "municipio" : {
+      "codigo" : "410240",
+      "valor" : "BANDEIRANTES"
+    },
+    "pais" : {
+      "codigo" : "10",
+      "valor" : "BRASIL"
+    },
+    "uf" : {
+      "codigo" : "PR",
+      "valor" : "PARANA"
+    }
+  },
+  "nomeSocial" : null,
+  "partoGemelar" : "false",
+  "dataNascimento" : "1948-09-21",
+  "tipoSanguineo" : null,
+  "etniaIndigena" : {
+    "codigo" : null,
+    "valor" : null
+  },
+  "cpf" : "35864796972",
+  "ativo" : "true",
+  "telefone" : [
+    {
+      "enumTipo" : "CEL",
+      "valor" : "5541984475618"
+    }
+  ],
+  "vivo" : "true",
+  "grauQualidade" : 83,
+  "dataAtualizacao" : "2020-07-28T13:19:05.000-03:00",
+  "racaCor" : {
+    "codigo" : "01",
+    "valor" : "BRANCA"
+  },
+  "enumSexoBiologico" : "F",
+  "enumIdentidadeGenero" : null,
+  "@version" : "1",
+  "dataObito" : null,
+  "nacionalidade" : {
+    "dataNaturalizacao" : null,
+    "dataEntradaBrasil" : null,
+    "numPortariaNaturalizacao" : null,
+    "enumNacionalidade" : "B"
+  },
+  "euid" : "0188978635",
+  "email" : null,
+  "nomePai" : "GETULIO CARIAS",
+  "partoGemelarOrdem" : null
+}

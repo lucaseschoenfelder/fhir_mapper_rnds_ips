@@ -1,0 +1,21 @@
+{
+  "dataAtualizacao" : "2023-04-01T00:00:00",
+  "coUnidade" : "",
+  "nome" : "Elivan Santos Silva",
+  "cnes" : "6224067",
+  "cns" : "700908955740294",
+  "cpf" : "05297866561",
+  "@timestamp" : "2023-05-15T19:30:59.474Z",
+  "competencia" : "202304",
+  "@version" : "1",
+  "cbo" : [
+    {
+      "valor" : "Medico da estrategia",
+      "codigo" : "225142"
+    },
+    {
+      "valor" : "Cirurgião dentista - clínico geral",
+      "codigo" : "223208"
+    }
+  ]
+}
