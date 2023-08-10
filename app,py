@@ -1,218 +1,22 @@
 from flask import Flask, jsonify, make_response, request
 import requests
 from flask_cors import CORS
-from fhir.resources.patient import Patient
-from fhir.resources.identifier import Identifier
-from fhir.resources.humanname import HumanName
-from fhir.resources.extension import Extension
-from fhirpathpy import evaluate
+from mappings.individuo_to_patient import map_patient
+from mappings.profissional_to_practitioner import map_practitioner
 
 app = Flask(__name__)
 
 CORS(app)
 
-def lookup(system, code):
-    r = requests.get(f'{system}&code={code}')
-    if r.status_code == 200:
-        return evaluate(r.json(), "Parameters.parameter.where(name='display').valueString")
-    else:
-        print(f'Falha ao fazer lookup')
-        return None
-
+@app.route('/patient', methods=['POST'])
+def teste_patient():
+    patient_rnds = request.get_json()
+    return jsonify(map_patient(patient_rnds))
 
 @app.route('/practitioner', methods=['POST'])
-def map_practitioner():
+def teste_practitioner():
     practitioner_rnds = request.get_json()
-
-    if practitioner_rnds:
-
-        identifier_system = None #?
-        identifier_value = None #?
-
-        name_text = evaluate(practitioner_rnds, "Practitioner.name.where(use='official').text")[0]
-
-        practitioner = {
-            "resourceType" : "Practitioner",
-            "identifier" : [
-                {
-                    "system" : identifier_system,
-                    "value" : identifier_value
-                }
-            ],
-            "name" : [
-                {
-                    "text" : name_text,
-                    "_family" : {
-                        "extension": [
-                            {
-                                "url": "http://hl7.org/fhir/StructureDefinition/data-absent-reason",
-                                "valueCode": "unknown"
-                            }
-                        ]
-                    },
-                    "_given" : [
-                        {
-                            "extension": [
-                                {
-                                    "url": "http://hl7.org/fhir/StructureDefinition/data-absent-reason",
-                                    "valueCode": "unknown"
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ],
-        }
-
-        if len(evaluate(practitioner_rnds, "practitioner.address")) > 0:
-            address_line = evaluate(practitioner_rnds, "Practitioner.address.where(use='home').line")
-            address_city = evaluate(practitioner_rnds, "Practitioner.address.where(use='home').city")[0]
-            address_state = evaluate(practitioner_rnds, "Practitioner.address.where(use='home').state")[0]
-            address_postalCode = evaluate(practitioner_rnds, "Practitioner.address.where(use='home').postalCode")[0]
-
-            # query for city
-            query = lookup('https://oclapi2.gointerop.com/fhir/CodeSystem/$lookup?system=http://www.saude.gov.br/fhir/r4/CodeSystem/BRDivisaoGeograficaBrasil', address_city)
-            if query is not None:
-                address_city = query[0]
-
-            #query for state
-            query = lookup('https://oclapi2.gointerop.com/fhir/CodeSystem/$lookup?system=http://www.saude.gov.br/fhir/r4/CodeSystem/BRDivisaoGeograficaBrasil', address_state)
-            if query is not None:
-                address_state = query[0]
-            
-            #adicionar tipo logradouro
-
-            practitioner["address"] = [
-                {
-                    "use" : "home",
-                    "type" : "physical",
-                    "text" : " ".join(address_line),
-                    "city" : address_city,
-                    "state" : address_state,
-                    "postalCode" : address_postalCode
-                }
-            ]
-
-        if len(evaluate(practitioner_rnds, "Practitioner.telecom")) > 0:
-            telecom_value = evaluate(practitioner_rnds, "Practitioner.telecom.where(system='http://hl7.org/fhir/ValueSet/contact-point-system').value")[0]
-            telecom_use = evaluate(practitioner_rnds, "Practitioner.telecom.where(system='http://hl7.org/fhir/ValueSet/contact-point-system').use")[0]
-
-            practitioner["telecom"] = [
-                {
-                    "system" : "phone",
-                    "value" : telecom_value
-                }
-            ]
-        
-        return jsonify({'resource': Practitioner(**practitioner).dict()}), 200
-
-
-
-
-@app.route('/patient', methods=['POST'])
-def map_patient():
-    patient_rnds = request.get_json()
-
-    if patient_rnds:
-
-        # adicionar query CNS
-        identifier_system = evaluate(patient_rnds, "Patient.identifier.where(system='https://rnds-fhir.saude.gov.br/NamingSystem/cpf').system")[0]
-
-        identifier_value = evaluate(patient_rnds, "Patient.identifier.where(system='https://rnds-fhir.saude.gov.br/NamingSystem/cpf').value")[0]
-
-        name_text = evaluate(patient_rnds, "Patient.name.where(use='official').text")[0]
-
-        gender = evaluate(patient_rnds, "Patient.gender")[0]
-        
-        birth_date = evaluate(patient_rnds, "Patient.birthDate")[0]
-
-        patient = {
-            "resourceType" : "Patient",
-            "identifier" : [
-                {
-                    "system" : identifier_system,
-                    "value" : identifier_value
-                }
-            ],
-            "name" : [
-                {
-                    "text" : name_text,
-                    "_family" : {
-                        "extension": [
-                            {
-                                "url": "http://hl7.org/fhir/StructureDefinition/data-absent-reason",
-                                "valueCode": "unknown"
-                            }
-                        ]
-                    },
-                    "_given" : [
-                        {
-                            "extension": [
-                                {
-                                    "url": "http://hl7.org/fhir/StructureDefinition/data-absent-reason",
-                                    "valueCode": "unknown"
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ],
-            "gender" : gender,
-            "birthDate" : birth_date,
-            "generalPractitioner" : [
-                {
-                    "extension": [
-                            {
-                                "url": "http://hl7.org/fhir/StructureDefinition/data-absent-reason",
-                                "valueCode": "unknown"
-                            }
-                        ]
-                }
-            ]
-        }
-        
-        if len(evaluate(patient_rnds, "Patient.address")) > 0:
-            address_line = evaluate(patient_rnds, "Patient.address.where(use='home').line")
-            address_city = evaluate(patient_rnds, "Patient.address.where(use='home').city")[0]
-            address_state = evaluate(patient_rnds, "Patient.address.where(use='home').state")[0]
-            address_postalCode = evaluate(patient_rnds, "Patient.address.where(use='home').postalCode")[0]
-
-            # query for city
-            query = lookup('https://oclapi2.gointerop.com/fhir/CodeSystem/$lookup?system=http://www.saude.gov.br/fhir/r4/CodeSystem/BRDivisaoGeograficaBrasil', address_city)
-            if query is not None:
-                address_city = query[0]
-
-            #query for state
-            query = lookup('https://oclapi2.gointerop.com/fhir/CodeSystem/$lookup?system=http://www.saude.gov.br/fhir/r4/CodeSystem/BRDivisaoGeograficaBrasil', address_state)
-            if query is not None:
-                address_state = query[0]
-            
-            #adicionar tipo logradouro
-
-            patient["address"] = [
-                {
-                    "use" : "home",
-                    "type" : "physical",
-                    "text" : " ".join(address_line),
-                    "city" : address_city,
-                    "state" : address_state,
-                    "postalCode" : address_postalCode
-                }
-            ]
-        
-        if len(evaluate(patient_rnds, "Patient.telecom")) > 0:
-            telecom_value = evaluate(patient_rnds, "Patient.telecom.where(system='phone').value")[0]
-            telecom_use = evaluate(patient_rnds, "Patient.telecom.where(system='phone').use")[0]
-
-            patient["telecom"] = [
-                {
-                    "system" : "phone",
-                    "value" : telecom_value
-                }
-            ]
-
-
-        return jsonify({'resource': Patient(**patient).dict()}), 200
+    return jsonify(map_practitioner(practitioner_rnds))
 
 if  __name__ == '__main__': 
     app.run(host='0.0.0.0', port=5000, debug=True)
