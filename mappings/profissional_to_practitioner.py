@@ -3,8 +3,8 @@ from fhirpathpy import evaluate
 from utils.utils import lookup
 
 def map_practitioner(practitioner_rnds):
-    identifier_system = None #TODO: adicionar evaluate pelo system
-    identifier_value = None #TODO: adicionar evaluate pelo system
+    identifier_system = "None" #TODO: adicionar evaluate pelo system
+    identifier_value = "None" #TODO: adicionar evaluate pelo system
 
     name_text = evaluate(practitioner_rnds, "Practitioner.name.where(use='official').text")[0]
 

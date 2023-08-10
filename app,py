@@ -1,22 +1,94 @@
 from flask import Flask, jsonify, make_response, request
-import requests
 from flask_cors import CORS
+import requests
+from fhirpathpy import evaluate
 from mappings.individuo_to_patient import map_patient
 from mappings.profissional_to_practitioner import map_practitioner
+from mappings.exame_laboratorial_to_observation import map_observation_results_laboratory
+from utils import *
+import uuid
+from fhir.resources.bundle import Bundle
 
 app = Flask(__name__)
 
 CORS(app)
 
-@app.route('/patient', methods=['POST'])
-def teste_patient():
-    patient_rnds = request.get_json()
-    return jsonify(map_patient(patient_rnds))
+#@app.route('/patient', methods=['POST'])
+#def teste_mapping_patient():
+#    return jsonify(map_patient(utils.mock_patient_rnds))
 
-@app.route('/practitioner', methods=['POST'])
-def teste_practitioner():
-    practitioner_rnds = request.get_json()
-    return jsonify(map_practitioner(practitioner_rnds))
+#@app.route('/practitioner', methods=['POST'])
+#def teste_mapping_practitioner():
+#    practitioner_rnds = request.get_json()
+#    return jsonify(map_practitioner(practitioner_rnds))
+
+#@app.route('/exame_laboratorial', methods=['POST'])
+#def teste_mapping_observation():
+#    observation_rnds = request.get_json()
+#    observation_rnds = evaluate(observation_rnds, "Bundle.entry.where(resource.resourceType = 'Observation').resource")[0]
+#    return jsonify(map_observation_results_laboratory(observation_rnds))
+
+@app.route("/sumario_exames", methods=["POST"])
+def get_summary_from_exams():
+    bundle_rnds = request.get_json()
+
+    bundle_entries = []
+
+    # 1º: recuperar informacoes do paciente atraves do CADSUS
+    patient_cns = evaluate(bundle_rnds, "Bundle.entry.where(resource.resourceType = 'Composition').resource.subject.identifier.value")[0]
+    # TODO: chamada para o cadsus
+    
+    # 2º: mapear paciente para o formato do IPS
+    patient_ips = map_patient(utils.mock_patient_rnds)
+    
+    # 3º: criar bloco transacional de criacao do paciente
+    patient_full_url = f'urn:uuid:{str(uuid.uuid4())}'
+    bundle_entries.append({
+        "fullUrl" : patient_full_url,
+        "resource" : patient_ips,
+        "request" : {
+            "method" : "POST",
+            "url" : "Patient",
+            "ifNoneExist" : f'identifier=http://rnds.saude.gov.br/fhir/r4/NamingSystem/cns|{patient_cns}'
+        }
+    })
+
+    # 4º recuperar informacoes do profissional atraves do ?
+    practitioner_identifier = evaluate(bundle_rnds, "Bundle.entry.where(resource.resourceType = 'Composition').resource.author.where(identifier.system = 'https://rnds-fhir.saude.gov.br/StructureDefinition/BRPessoaJuridicaProfissionalLiberal-1.0').identifier.value")[0]
+    # TODO: chamada para o sistema de profissionais
+
+    # 5º mapear profssional para o formato do IPS
+    practitioner_ips = map_practitioner(utils.mock_practitioner_rnds)
+
+    # 6º criar bloco transacional de criação do practitioner
+    practitioner_full_url = f'urn:uuid:{str(uuid.uuid4())}'
+    bundle_entries.append({
+        "fullUrl" : practitioner_full_url,
+        "resource" : practitioner_ips,
+        "request" : {
+            "method" : "POST",
+            "url" : "Practitioner",
+            "ifNoneExist" : f'?identifier=http://rnds.saude.gov.br/fhir/r4/NamingSystem/cpf|{practitioner_identifier}'
+        }
+    })
+
+    # 7º mapear restantes recursos
+    observation_ips = map_observation_results_laboratory(evaluate(bundle_rnds, "Bundle.entry.where(resource.resourceType = 'Observation').resource")[0])
+    bundle_entries.append({
+        "resource" : observation_ips 
+    })
+    #TODO: adicionar condicao e specimen
+    
+    #TODO: adicionar campos de metadados do bundle
+    transactional_bundle = {
+        "resourceType": "Bundle",
+        "type": "transaction",
+        "entry" : bundle_entries
+    }
+
+    return jsonify(Bundle(**transactional_bundle).dict())
+    
+
 
 if  __name__ == '__main__': 
     app.run(host='0.0.0.0', port=5000, debug=True)
