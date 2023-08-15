@@ -2,13 +2,11 @@ from fhir.resources.observation import Observation
 from fhirpathpy import evaluate
 from utils.utils import lookup
 
-def map_observation_results_laboratory(observation_rnds):
-    print(f'Entrei no mapping com observation_rnds:{observation_rnds}')
-
+def map_observation_results_laboratory(observation_rnds, subject_full_url, performer_full_url):
     observation_metadata_profile = "https://ips-brasil.web.app/StructureDefinition-ObservationResultsLaboratoryBRIPS.html"
 
     observation_coding_code = evaluate(observation_rnds, "Observation.code.coding.code")[0]
-    print(f'observation_coding_code:{observation_coding_code}')
+
     observation_coding_system = "https://loinc.org/" 
 
     observation_effectiveDateTime = evaluate(observation_rnds, "Observation.effectiveDateTime")[0]
@@ -35,12 +33,12 @@ def map_observation_results_laboratory(observation_rnds):
             ]
         },
         "subject" : {
-            "reference" : "TODO"
+            "reference" : subject_full_url
         },
         "effectiveDateTime" : observation_effectiveDateTime,
         "performer" : [
             {
-                "reference" : "TODO"
+                "reference" : performer_full_url
             }
         ]
     }

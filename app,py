@@ -6,6 +6,7 @@ from mappings.individuo_to_patient import map_patient
 from mappings.profissional_to_practitioner import map_practitioner
 from mappings.exame_laboratorial_to_observation import map_observation_results_laboratory
 from mappings.amostra_biologica_to_specimen import map_specimen
+from mappings.condicao_saude_to_condition import map_condition_condicaoSaude
 from utils import *
 import uuid
 from fhir.resources.bundle import Bundle
@@ -74,17 +75,25 @@ def get_summary_from_exams():
     })
 
     # 7º mapear restantes recursos
-    observation_ips = map_observation_results_laboratory(evaluate(bundle_rnds, "Bundle.entry.where(resource.resourceType = 'Observation').resource")[0])
+    observation_ips = map_observation_results_laboratory(evaluate(bundle_rnds, "Bundle.entry.where(resource.resourceType = 'Observation').resource")[0], patient_full_url, practitioner_full_url)
     bundle_entries.append({
         "resource" : observation_ips 
     })
-    #TODO: adicionar condicao
-    if len(evaluate(bundle_rnds, "Bundle.entry.where(resource.resourceType = 'Specimen')")) > 0:
-        condition_ips = map_specimen(evaluate(bundle_rnds, "Bundle.entry.where(resource.resourceType = 'Specimen')")[0])
+    
+    # mapeamento de specimen
+    if len(evaluate(bundle_rnds, "Bundle.entry.where(resource.resourceType = 'Specimen').resource")) > 0:
+        condition_ips = map_specimen(evaluate(bundle_rnds, "Bundle.entry.where(resource.resourceType = 'Specimen').resource")[0])
         bundle_entries.append({
             "resource" : condition_ips
         })
     
+    # mapeamento de condition
+    if len(evaluate(bundle_rnds, "Bundle.entry.where(resource.resourceType = 'Condition').resource")) > 0:
+        condition_ips = map_condition_condicaoSaude(evaluate(bundle_rnds, "Bundle.entry.where(resource.resourceType = 'Condition').resource")[0], patient_full_url)
+        bundle_entries.append({
+            "resource" : condition_ips
+        })
+
     #TODO: adicionar campos de metadados do bundle
     transactional_bundle = {
         "resourceType": "Bundle",
