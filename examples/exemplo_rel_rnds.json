@@ -1,0 +1,161 @@
+{
+    "resourceType": "Bundle",
+    "meta": {
+        "lastUpdated": "2022-01-07T14:03:07.724+00:00"
+    },
+    "identifier": {
+        "system": "http://www.saude.gov.br/fhir/r4/NamingSystem/BRRNDS-18131",
+        "value": "2430090330_200_1505"
+    },
+    "type": "document",
+    "timestamp": "2022-01-07T14:03:07.724+00:00",
+    "entry": [
+        {
+            "fullUrl": "5d5abe62-ab59-41e4-8f1c-945a4434d98f-r3x7",
+            "resource": {
+                "resourceType": "Composition",
+                "id": "5d5abe62-ab59-41e4-8f1c-945a4434d98f-r3x7",
+                "meta": {
+                    "profile": [
+                        "http://www.saude.gov.br/fhir/r4/StructureDefinition/BRResultadoExameLaboratorial-2.0"
+                    ]
+                },
+                "status": "final",
+                "type": {
+                    "coding": [
+                        {
+                            "system": "http://www.saude.gov.br/fhir/r4/CodeSystem/BRTipoDocumento",
+                            "code": "REL"
+                        }
+                    ]
+                },
+                "subject": {
+                    "identifier": {
+                        "system": "http://www.saude.gov.br/fhir/r4/StructureDefinition/BRIndividuo-1.0",
+                        "value": "898004643618975"
+                    }
+                },
+                "date": "2022-01-07T11:02:07-03:00",
+                "author": [
+                    {
+                        "identifier": {
+                            "system": "http://www.saude.gov.br/fhir/r4/StructureDefinition/BREstabelecimentoSaude-1.0",
+                            "value": "3066746"
+                        }
+                    }
+                ],
+                "title": "Resultado de Exame Laboratorial",
+                "section": [
+                    {
+                        "entry": [
+                            {
+                                "reference": "Observation/5d5abe62-ab59-41e4-8f1c-945a4434d98f-r3x7-1"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "fullUrl": "5d5abe62-ab59-41e4-8f1c-945a4434d98f-r3x7-1",
+            "resource": {
+                "resourceType": "Observation",
+                "id": "5d5abe62-ab59-41e4-8f1c-945a4434d98f-r3x7-1",
+                "meta": {
+                    "profile": [
+                        "http://www.saude.gov.br/fhir/r4/StructureDefinition/BRDiagnosticoLaboratorioClinico-2.0"
+                    ]
+                },
+                "status": "final",
+                "category": [
+                    {
+                        "coding": [
+                            {
+                                "system": "http://www.saude.gov.br/fhir/r4/CodeSystem/BRSubgrupoTabelaSUS",
+                                "code": "0214"
+                            }
+                        ]
+                    }
+                ],
+                "code": {
+                    "coding": [
+                        {
+                            "system": "http://www.saude.gov.br/fhir/r4/CodeSystem/BRNomeExameLOINC",
+                            "code": "94558-4"
+                        }
+                    ]
+                },
+                "subject": {
+                    "identifier": {
+                        "system": "http://www.saude.gov.br/fhir/r4/StructureDefinition/BRIndividuo-1.0",
+                        "value": "898004643618975"
+                    }
+                },
+                "effectiveDateTime": "2022-01-07T10:19:00-03:00",
+                "issued": "2022-01-07T11:02:07-03:00",
+                "performer": [
+                    {
+                        "identifier": {
+                            "system": "http://www.saude.gov.br/fhir/r4/StructureDefinition/BRPessoaJuridicaProfissionalLiberal-1.0",
+                            "value": "3066746"
+                        }
+                    }
+                ],
+                "valueCodeableConcept": {
+                    "coding": [
+                        {
+                            "system": "http://www.saude.gov.br/fhir/r4/CodeSystem/BRResultadoQualitativoExame",
+                            "code": "2"
+                        }
+                    ]
+                },
+                "interpretation": [
+                    {
+                        "coding": [
+                            {
+                                "system": "http://www.saude.gov.br/fhir/r4/CodeSystem/BRResultadoQualitativoExame",
+                                "code": "2"
+                            }
+                        ]
+                    }
+                ],
+                "note": [
+                    {
+                        "text": "-"
+                    }
+                ],
+                "method": {
+                    "text": "Imunocromatografia-"
+                },
+                "specimen": {
+                    "reference": "Specimen/5d5abe62-ab59-41e4-8f1c-945a4434d98f-r3x7-2"
+                },
+                "referenceRange": [
+                    {
+                        "text": "Não detectado-"
+                    }
+                ]
+            }
+        },
+        {
+            "fullUrl": "5d5abe62-ab59-41e4-8f1c-945a4434d98f-r3x7-2",
+            "resource": {
+                "resourceType": "Specimen",
+                "id": "5d5abe62-ab59-41e4-8f1c-945a4434d98f-r3x7-2",
+                "meta": {
+                    "profile": [
+                        "http://www.saude.gov.br/fhir/r4/StructureDefinition/BRAmostraBiologica-1.0"
+                    ]
+                },
+                "type": {
+                    "coding": [
+                        {
+                            "system": "http://www.saude.gov.br/fhir/r4/CodeSystem/BRTipoAmostraGAL",
+                            "code": "ASNAFA"
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

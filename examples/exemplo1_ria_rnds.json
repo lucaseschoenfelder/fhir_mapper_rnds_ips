@@ -1,0 +1,117 @@
+{
+    "resourceType": "Bundle",
+    "meta": {
+        "lastUpdated": "2021-10-04T03:10:00-03:00"
+    },
+    "identifier": {
+        "system": "http://www.saude.gov.br/fhir/r4/NamingSystem/BRRNDS-18262",
+        "value": "2b9724f7-716f-4e0e-a1ee-dd630e9f5152"
+    },
+    "type": "document",
+    "timestamp": "2021-10-04T03:10:00-03:00",
+    "entry": [
+        {
+            "fullUrl": "urn:uuid:383eb2a8-0c57-4021-b5bf-85b8fbe36c76-i0b0",
+            "resource": {
+                "resourceType": "Composition",
+                "id": "383eb2a8-0c57-4021-b5bf-85b8fbe36c76-i0b0",
+                "meta": {
+                    "profile": [
+                        "http://www.saude.gov.br/fhir/r4/StructureDefinition/BRRegistroImunobiologicoAdministradoCampanha-1.0"
+                    ]
+                },
+                "status": "final",
+                "type": {
+                    "coding": [
+                        {
+                            "system": "http://www.saude.gov.br/fhir/r4/CodeSystem/BRTipoDocumento",
+                            "code": "RIA"
+                        }
+                    ]
+                },
+                "subject": {
+                    "identifier": {
+                        "system": "http://www.saude.gov.br/fhir/r4/StructureDefinition/BRIndividuo-1.0",
+                        "value": "704109642372750"
+                    }
+                },
+                "date": "2021-10-04T03:10:00-03:00",
+                "author": [
+                    {
+                        "identifier": {
+                            "system": "http://www.saude.gov.br/fhir/r4/StructureDefinition/BREstabelecimentoSaude-1.0",
+                            "value": "2055031"
+                        }
+                    }
+                ],
+                "title": "Registro de Imunobiologico Administrado na Campanha",
+                "section": [
+                    {
+                        "entry": [
+                            {
+                                "reference": "Immunization/383eb2a8-0c57-4021-b5bf-85b8fbe36c76-i0b0-1"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "fullUrl": "urn:uuid:383eb2a8-0c57-4021-b5bf-85b8fbe36c76-i0b0-1",
+            "resource": {
+                "resourceType": "Immunization",
+                "id": "383eb2a8-0c57-4021-b5bf-85b8fbe36c76-i0b0-1",
+                "meta": {
+                    "profile": [
+                        "http://www.saude.gov.br/fhir/r4/StructureDefinition/BRImunobiologicoAdministradoCampanha-1.0"
+                    ]
+                },
+                "extension": [
+                    {
+                        "url": "http://www.saude.gov.br/fhir/r4/StructureDefinition/BRGrupoAtendimento",
+                        "valueCodeableConcept": {
+                            "coding": [
+                                {
+                                    "system": "http://www.saude.gov.br/fhir/r4/CodeSystem/BRGrupoAtendimento",
+                                    "code": "000201"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "status": "completed",
+                "vaccineCode": {
+                    "coding": [
+                        {
+                            "system": "http://www.saude.gov.br/fhir/r4/CodeSystem/BRImunobiologico",
+                            "code": "87"
+                        }
+                    ]
+                },
+                "patient": {
+                    "identifier": {
+                        "system": "http://www.saude.gov.br/fhir/r4/StructureDefinition/BRIndividuo-1.0",
+                        "value": "704109642372750"
+                    }
+                },
+                "occurrenceDateTime": "2021-10-04",
+                "manufacturer": {
+                    "display": "PFIZER"
+                },
+                "lotNumber": "FF8845",
+                "performer": [
+                    {
+                        "actor": {
+                            "reference": "Practitioner/204422138530002"
+                        }
+                    }
+                ],
+                "protocolApplied": [
+                    {
+                        "doseNumberString": "2"
+                    }
+                ]
+            }
+        }
+    ]
+}

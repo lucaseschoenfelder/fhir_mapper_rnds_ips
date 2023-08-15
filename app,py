@@ -5,6 +5,7 @@ from fhirpathpy import evaluate
 from mappings.individuo_to_patient import map_patient
 from mappings.profissional_to_practitioner import map_practitioner
 from mappings.exame_laboratorial_to_observation import map_observation_results_laboratory
+from mappings.amostra_biologica_to_specimen import map_specimen
 from utils import *
 import uuid
 from fhir.resources.bundle import Bundle
@@ -77,7 +78,12 @@ def get_summary_from_exams():
     bundle_entries.append({
         "resource" : observation_ips 
     })
-    #TODO: adicionar condicao e specimen
+    #TODO: adicionar condicao
+    if len(evaluate(bundle_rnds, "Bundle.entry.where(resource.resourceType = 'Specimen')")) > 0:
+        condition_ips = map_specimen(evaluate(bundle_rnds, "Bundle.entry.where(resource.resourceType = 'Specimen')")[0])
+        bundle_entries.append({
+            "resource" : condition_ips
+        })
     
     #TODO: adicionar campos de metadados do bundle
     transactional_bundle = {
