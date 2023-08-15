@@ -7,6 +7,7 @@ from mappings.profissional_to_practitioner import map_practitioner
 from mappings.exame_laboratorial_to_observation import map_observation_results_laboratory
 from mappings.amostra_biologica_to_specimen import map_specimen
 from mappings.condicao_saude_to_condition import map_condition_condicaoSaude
+from mappings.imunobiologico_administrado_to_immunization import map_immunization
 from utils import *
 import uuid
 from fhir.resources.bundle import Bundle
@@ -30,7 +31,67 @@ CORS(app)
 #    observation_rnds = evaluate(observation_rnds, "Bundle.entry.where(resource.resourceType = 'Observation').resource")[0]
 #    return jsonify(map_observation_results_laboratory(observation_rnds))
 
-@app.route("/sumario_exames", methods=["POST"])
+@app.route("/ria", methods=['POST'])
+def get_summary_from_immunobiological_administration():
+    bundle_rnds = request.get_json()
+    print(f'bundle_rnds: {bundle_rnds}')
+    bundle_entries = []
+
+    # 1º: recuperar informacoes do paciente atraves do CADSUS
+    print(evaluate(bundle_rnds, "Bundle.entry.where(resource.resourceType = \"Composition\").resource.subject.identifier.value"))
+    patient_cns = evaluate(bundle_rnds, "Bundle.entry.where(resource.resourceType = 'Composition').resource.subject.identifier.value")[0]
+    # TODO: chamada para o cadsus
+
+    # 2º: mapear paciente para o formato do IPS
+    patient_ips = map_patient(utils.mock_patient_rnds)
+
+    # 3º: criar bloco transacional de criacao do paciente
+    patient_full_url = f'urn:uuid:{str(uuid.uuid4())}'
+    bundle_entries.append({
+        "fullUrl" : patient_full_url,
+        "resource" : patient_ips,
+        "request" : {
+            "method" : "POST",
+            "url" : "Patient",
+            "ifNoneExist" : f'identifier=http://rnds.saude.gov.br/fhir/r4/NamingSystem/cns|{patient_cns}'
+        }
+    })
+
+    # 4º recuperar informacoes do profissional atraves do ?
+    practitioner_identifier = evaluate(bundle_rnds, "Bundle.entry.where(resource.resourceType = 'Composition').resource.author.where(identifier.system = 'http://www.saude.gov.br/fhir/r4/StructureDefinition/BREstabelecimentoSaude-1.0').identifier.value")[0]
+    # TODO: chamada para o sistema de profissionais
+
+    # 5º mapear profssional para o formato do IPS
+    practitioner_ips = map_practitioner(utils.mock_practitioner_rnds)
+
+    # 6º criar bloco transacional de criação do practitioner
+    practitioner_full_url = f'urn:uuid:{str(uuid.uuid4())}'
+    bundle_entries.append({
+        "fullUrl" : practitioner_full_url,
+        "resource" : practitioner_ips,
+        "request" : {
+            "method" : "POST",
+            "url" : "Practitioner",
+            "ifNoneExist" : f'?identifier=http://rnds.saude.gov.br/fhir/r4/NamingSystem/cpf|{practitioner_identifier}'
+        }
+    })
+
+    # 7º mapear restantes recursos
+    immunization_ips = map_immunization(evaluate(bundle_rnds, "Bundle.entry.where(resource.resourceType = 'Immunization').resource")[0], patient_full_url)
+    bundle_entries.append({
+        "resource" : immunization_ips 
+    })
+
+    #TODO: adicionar campos de metadados do bundle
+    transactional_bundle = {
+        "resourceType": "Bundle",
+        "type": "transaction",
+        "entry" : bundle_entries
+    }
+
+    return jsonify(Bundle(**transactional_bundle).dict())
+
+@app.route("/rel", methods=["POST"])
 def get_summary_from_exams():
     bundle_rnds = request.get_json()
 
