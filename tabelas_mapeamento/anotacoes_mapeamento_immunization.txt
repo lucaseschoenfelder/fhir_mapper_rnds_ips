@@ -1,0 +1,6 @@
+* vaccineCode precisa fazer alguma substituição de system, adição de display através de lookup ou adição de tradução?
+* referência ao paciente vai ser pelo full url gerado para o recurso no bundle mesmo?
+* não lembro o que tinhamos definido para o manufacturer. No ips, deve ser feita uma referência para um organization, mas nos exemplos que eles nos mandaram só vem o display
+* quais são as tabelas para fazer lookup de route e site? todas essas vai precisar da adição de display né?
+* Confirmando, o protocolAPplied vamos fazer um lookup e informar no doseNumberString mesmo né? no ocl as traduções estão vindo em espanhol e portugues apenas
+

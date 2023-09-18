@@ -38,7 +38,7 @@ def get_summary_from_immunobiological_administration():
     print(f'bundle_rnds: {bundle_rnds}')
     bundle_entries = []
 
-    # 1º: recuperar informacoes do paciente atraves do CADSUS
+    # recuperar informacoes do paciente atraves do CADSUS
     patient_cns = evaluate(bundle_rnds, "Bundle.entry.where(resource.resourceType = 'Composition').resource.subject.identifier.value")[0]
     # TODO: chamada para o cadsus
 
@@ -87,70 +87,78 @@ def get_summary_from_immunobiological_administration():
         "entry" : bundle_entries
     }
 
-    return jsonify(Bundle(**document_bundle).dict())
+    return jsonify(document_bundle)
 
 @app.route("/rel", methods=["POST"])
 def get_summary_from_exams():
     bundle_rnds = request.get_json()
-
+    print(f'bundle_rnds: {bundle_rnds}')
     bundle_entries = []
 
-    # 1º: recuperar informacoes do paciente atraves do CADSUS
+    # recuperar informacoes do paciente atraves do CADSUS
     patient_cns = evaluate(bundle_rnds, "Bundle.entry.where(resource.resourceType = 'Composition').resource.subject.identifier.value")[0]
     # TODO: chamada para o cadsus
     
-    # 2º: mapear paciente para o formato do IPS
-    patient_ips = map_patient(utils.mock_patient_rnds)
+    practitioner_identifier = evaluate(bundle_rnds, "Bundle.entry.where(resource.resourceType = 'Composition').resource.author.where(identifier.system = 'https://rnds-fhir.saude.gov.br/StructureDefinition/BRPessoaJuridicaProfissionalLiberal-1.0').identifier.value")[0]
+    # recuperar informacoes do profissional atraves do ?
+    # TODO: chamada para o sistema de profissionais
     
-    # 3º: criar bloco transacional de criacao do paciente
+    # mapear paciente para o formato do IPS
+    patient_ips = map_patient(utils.mock_patient_rnds)
     patient_full_url = f'urn:uuid:{str(uuid.uuid4())}'
+    
+    # mapear profssional para o formato do IPS
+    practitioner_ips = map_practitioner(utils.mock_practitioner_rnds)
+    practitioner_full_url = f'urn:uuid:{str(uuid.uuid4())}'
+
+    composition_ips = get_composition(patient_full_url, practitioner_full_url)
+
+    bundle_entries.append({
+        "fullUrl" : f'urn:uuid:{str(uuid.uuid4())}',
+        "resource" : composition_ips
+    })
+
     bundle_entries.append({
         "fullUrl" : patient_full_url,
         "resource" : patient_ips
     })
 
-    # 4º recuperar informacoes do profissional atraves do ?
-    practitioner_identifier = evaluate(bundle_rnds, "Bundle.entry.where(resource.resourceType = 'Composition').resource.author.where(identifier.system = 'https://rnds-fhir.saude.gov.br/StructureDefinition/BRPessoaJuridicaProfissionalLiberal-1.0').identifier.value")[0]
-    # TODO: chamada para o sistema de profissionais
-
-    # 5º mapear profssional para o formato do IPS
-    practitioner_ips = map_practitioner(utils.mock_practitioner_rnds)
-
-    # 6º criar bloco transacional de criação do practitioner
-    practitioner_full_url = f'urn:uuid:{str(uuid.uuid4())}'
     bundle_entries.append({
         "fullUrl" : practitioner_full_url,
         "resource" : practitioner_ips
     })
-
-    # 7º mapear restantes recursos
+    
+    # mapear restantes recursos
     observation_ips = map_observation_results_laboratory(evaluate(bundle_rnds, "Bundle.entry.where(resource.resourceType = 'Observation').resource")[0], patient_full_url, practitioner_full_url)
     bundle_entries.append({
-        "resource" : observation_ips 
+        "resource" : observation_ips,
+        "fullUrl" : f'urn:uuid:{str(uuid.uuid4())}'
     })
     
     # mapeamento de specimen
     if len(evaluate(bundle_rnds, "Bundle.entry.where(resource.resourceType = 'Specimen').resource")) > 0:
         condition_ips = map_specimen(evaluate(bundle_rnds, "Bundle.entry.where(resource.resourceType = 'Specimen').resource")[0])
         bundle_entries.append({
-            "resource" : condition_ips
+            "resource" : condition_ips,
+            "fullUrl" : f'urn:uuid:{str(uuid.uuid4())}'
         })
     
     # mapeamento de condition
     if len(evaluate(bundle_rnds, "Bundle.entry.where(resource.resourceType = 'Condition').resource")) > 0:
         condition_ips = map_condition_condicaoSaude(evaluate(bundle_rnds, "Bundle.entry.where(resource.resourceType = 'Condition').resource")[0], patient_full_url)
         bundle_entries.append({
-            "resource" : condition_ips
+            "resource" : condition_ips,
+            "fullUrl" : f'urn:uuid:{str(uuid.uuid4())}'
         })
 
     #TODO: adicionar campos de metadados do bundle
     document_bundle = {
         "resourceType": "Bundle",
-        "type": "transaction",
+        "type": "document",
         "entry" : bundle_entries
     }
 
-    return jsonify(Bundle(**document_bundle).dict())
+    return jsonify(document_bundle)
     
 
 

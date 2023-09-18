@@ -1,12 +1,31 @@
 import requests
 from fhirpathpy import evaluate
 
+def translate(system, code):
+    r = requests.get(f'https://oclapi2.gointerop.com/fhir/ConceptMap/$translate?system={system}&code={code}')
+    if r.status_code == 200:
+        
+        data = r.json()
+        
+        ret_val = {
+            "system" : evaluate(data, "Parameters.parameter.where(name='match').part.where(name='concept').valueCoding.system")[0],
+            "code" : evaluate(data, "Parameters.parameter.where(name='match').part.where(name='concept').valueCoding.code")[0]
+        }
+
+        return ret_val
+    else:
+        print(f'Falha ao fazer translate')
+        print(f'r.status_code:{r.status_code}.')
+        return None
+
 def lookup(system, code):
+    print(f'Entrei no lookup com system={system} e code={code}')
     r = requests.get(f'{system}&code={code}')
     if r.status_code == 200:
         return evaluate(r.json(), "Parameters.parameter.where(name='display').valueString")
     else:
         print(f'Falha ao fazer lookup')
+        print(f'r.status_code:{r.status_code}')
         return None
 
 mock_patient_rnds = {
